@@ -16,8 +16,12 @@ dotnet GraphQL.NodaTime
 
 ### Types
 
-In order to include the types in your schema use:
+You can register the types you use like any other GraphQL type by adding:
 
 ```
-schema.UseNodaTime();
+services.AddSingleton<InstantGraphType>();
+services.AddSingleton<LocalDateGraphType>();
+...
 ```
+
+in your `Startup`'s `ConfigureServices` method.
