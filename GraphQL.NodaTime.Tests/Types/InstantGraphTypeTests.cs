@@ -15,7 +15,6 @@ namespace GraphQL.NodaTime.Tests
                 Instant.FromUtc(2019, 10, 2, 12, 14, 18),
                 instant => instant + Duration.FromHours(3)
             );
-            schema.UseNodaTime();
             var json = schema.Execute(options =>
             {
                 options.Query = "query { test }";
