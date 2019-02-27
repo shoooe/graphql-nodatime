@@ -19,20 +19,21 @@ namespace GraphQL.NodaTime
                 return value;
             if (value is IsoDayOfWeek)
                 return (int)value;
-            return null;
+            return value;
         }
 
         public override object ParseValue(object value)
         {
-            return (IsoDayOfWeek)((int)value);
+            if (!(value is int intValue))
+                throw new FormatException();
+            return (IsoDayOfWeek)intValue;
         }
 
         public override object ParseLiteral(IValue value)
         {
-            if (!(value is IntValue))
-                return null;
-            var intVal = value as IntValue;
-            return (IsoDayOfWeek)((int)intVal.Value);
+            if (!(value is IntValue intValue))
+                throw new FormatException();
+            return (IsoDayOfWeek)intValue.Value;
         }
     }
 }

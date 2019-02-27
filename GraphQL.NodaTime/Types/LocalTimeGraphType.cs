@@ -20,30 +20,33 @@ namespace GraphQL.NodaTime
                 return value;
             if (value is LocalTime)
                 return (value as LocalTime?)?.ToString("r", CultureInfo.InvariantCulture);
-            return null;
+            return value;
         }
 
         public override object ParseValue(object value)
         {
+            if (!(value is string stringValue))
+                throw new FormatException();
+
             try
             {
-                var ret = LocalTimePattern.ExtendedIso.Parse(value as string).GetValueOrThrow();
+                var ret = LocalTimePattern.ExtendedIso.Parse(stringValue).GetValueOrThrow();
                 return ret;
             } 
-            catch (Exception) { return null; }
+            catch (Exception e) { throw new FormatException(null, e); }
         }
 
         public override object ParseLiteral(IValue value)
         {
+            if (!(value is StringValue stringValue))
+                throw new FormatException();
+
             try
             {
-                if (!(value is StringValue))
-                    return null;
-                var stringVal = value as StringValue;
-                var ret = LocalTimePattern.ExtendedIso.Parse(stringVal.Value).GetValueOrThrow();
+                var ret = LocalTimePattern.ExtendedIso.Parse(stringValue.Value).GetValueOrThrow();
                 return ret;
             } 
-            catch (Exception) { return null; }
+            catch (Exception e) { throw new FormatException(null, e); }
         }
     }
 }
