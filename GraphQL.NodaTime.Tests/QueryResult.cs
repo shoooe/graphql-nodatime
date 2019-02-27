@@ -1,10 +1,10 @@
 namespace GraphQL.NodaTime.Tests
 {
-    public class QueryResult
+    public class QueryResult<T>
     {
         public class DataResult
         {
-            public string Test { get; set; }
+            public T Test { get; set; }
         }
 
         public DataResult Data { get; set; }

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 using NodaTime;
@@ -18,7 +19,7 @@ namespace GraphQL.NodaTime
             if (value is string)
                 return value;
             if (value is LocalTime)
-                return (value as LocalTime?)?.ToString();
+                return (value as LocalTime?)?.ToString("r", CultureInfo.InvariantCulture);
             return null;
         }
 
