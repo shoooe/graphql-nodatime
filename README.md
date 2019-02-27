@@ -11,7 +11,7 @@ Install-Package GraphQL.NodaTime
 or
 
 ```
-dotnet GraphQL.NodaTime
+dotnet add package GraphQL.NodaTime
 ```
 
 ### Types
@@ -25,3 +25,12 @@ services.AddSingleton<LocalDateGraphType>();
 ```
 
 in your `Startup`'s `ConfigureServices` method.
+
+Here's a list of all supported types:
+
+| NodaTime        | GraphQL type  |
+| ------------- | ------------- |
+| Instant      | InstantGraphType |
+| IosDayOfWeek      | IsoDayOfWeekGraphType |
+| LocalDate      | LocalDateGraphType |
+| LocalTime      | LocalTimeGraphType |
