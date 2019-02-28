@@ -16,23 +16,23 @@ namespace GraphQL.NodaTime
 
         public override object Serialize(object value)
         {
-            if (value is int)
+            if (value is int intValue && intValue >= 1 && intValue <= 7)
                 return value;
-            if (value is IsoDayOfWeek)
-                return (int)value;
+            if (value is IsoDayOfWeek dowValue)
+                return (int)dowValue;
             return value;
         }
 
         public override object ParseValue(object value)
         {
-            if (!(value is int intValue))
+            if (!(value is int intValue && intValue >= 1 && intValue <= 7))
                 return null;
             return (IsoDayOfWeek)intValue;
         }
 
         public override object ParseLiteral(IValue value)
         {
-            if (!(value is IntValue intValue))
+            if (!(value is IntValue intValue && intValue.Value >= 1 && intValue.Value <= 7))
                 return null;
             return (IsoDayOfWeek)intValue.Value;
         }
