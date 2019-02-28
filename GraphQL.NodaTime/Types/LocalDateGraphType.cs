@@ -27,27 +27,27 @@ namespace GraphQL.NodaTime
         public override object ParseValue(object value)
         {
             if (!(value is string stringValue))
-                throw new FormatException();
+                return null;
 
             try
             {
                 var ret = LocalDatePattern.Iso.Parse(stringValue).GetValueOrThrow();
                 return ret;
             } 
-            catch (Exception e) { throw new FormatException(null, e); }
+            catch (Exception) { return null; }
         }
 
         public override object ParseLiteral(IValue value)
         {
             if (!(value is StringValue stringValue))
-                throw new FormatException();
+                return null;
 
             try
             {
                 var ret = LocalDatePattern.Iso.Parse(stringValue.Value).GetValueOrThrow();
                 return ret;
             } 
-            catch (Exception e) { throw new FormatException(null, e); }
+            catch (Exception) { return null; }
         }
     }
 }

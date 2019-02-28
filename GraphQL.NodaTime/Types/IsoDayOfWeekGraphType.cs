@@ -26,14 +26,14 @@ namespace GraphQL.NodaTime
         public override object ParseValue(object value)
         {
             if (!(value is int intValue))
-                throw new FormatException();
+                return null;
             return (IsoDayOfWeek)intValue;
         }
 
         public override object ParseLiteral(IValue value)
         {
             if (!(value is IntValue intValue))
-                throw new FormatException();
+                return null;
             return (IsoDayOfWeek)intValue.Value;
         }
     }

@@ -26,7 +26,7 @@ namespace GraphQL.NodaTime
             return value;
         }
 
-        private static Instant FromString(string stringValue)
+        private static object FromString(string stringValue)
         {
             return ParserComposer.FirstNonThrowing(new Func<string, Instant>[]
             {
@@ -38,10 +38,10 @@ namespace GraphQL.NodaTime
             }, stringValue);
         }
 
-        private static Instant FromDateTimeUtc(DateTime dateTime)
+        private static object FromDateTimeUtc(DateTime dateTime)
         {
             try { return Instant.FromDateTimeUtc(dateTime); }
-            catch (Exception e) { throw new FormatException(null, e); }
+            catch (Exception) { return null; }
         }
 
         public override object ParseValue(object value)
@@ -56,7 +56,7 @@ namespace GraphQL.NodaTime
                 return FromDateTimeUtc(dateTimeValue);
             }
 
-            throw new FormatException();
+            return null;
         }
 
         public override object ParseLiteral(IValue value)
@@ -71,7 +71,7 @@ namespace GraphQL.NodaTime
                 return FromDateTimeUtc(dateTimeValue.Value);
             }
 
-            throw new FormatException();
+            return null;
         }
     }
 }

@@ -7,10 +7,10 @@ namespace GraphQL.NodaTime
 {
     public static class ParserComposer
     {
-        public static T FirstNonThrowing<T>(IEnumerable<Func<string, T>> parsers, string value)
+        public static object FirstNonThrowing<T>(IEnumerable<Func<string, T>> parsers, string value)
         {
             if (parsers.Count() == 0)
-                throw new FormatException();
+                return null;
 
             foreach (var nextParser in parsers)
             {
@@ -21,7 +21,7 @@ namespace GraphQL.NodaTime
                 catch (Exception) { continue; }
             }
 
-            throw new FormatException();
+            return null;
         }
     }
 }
