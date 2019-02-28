@@ -22,7 +22,9 @@ namespace GraphQL.NodaTime
             if (value is DateTime dateTime)
                 return dateTime.ToString("o", CultureInfo.InvariantCulture);
             if (value is Instant instant)
-                return instant.ToString("g", CultureInfo.InvariantCulture);
+                return InstantPattern.ExtendedIso
+                    .WithCulture(CultureInfo.InvariantCulture)
+                    .Format(instant);
             return value;
         }
 
@@ -30,11 +32,15 @@ namespace GraphQL.NodaTime
         {
             return ParserComposer.FirstNonThrowing(new Func<string, Instant>[]
             {
-                str => OffsetDateTimePattern.ExtendedIso.Parse(str).GetValueOrThrow().ToInstant(),
+                str => OffsetDateTimePattern.ExtendedIso
+                    .WithCulture(CultureInfo.InvariantCulture)
+                    .Parse(str).GetValueOrThrow().ToInstant(),
                 str => OffsetDateTimePattern
                     .CreateWithInvariantCulture("yyyy'-'MM'-'dd'T'HH':'mm':'sso<+HHmm>")
                     .Parse(str).GetValueOrThrow().ToInstant(),
-                str => InstantPattern.ExtendedIso.Parse(str).GetValueOrThrow(),
+                str => InstantPattern.ExtendedIso
+                    .WithCulture(CultureInfo.InvariantCulture)
+                    .Parse(str).GetValueOrThrow(),
             }, stringValue);
         }
 

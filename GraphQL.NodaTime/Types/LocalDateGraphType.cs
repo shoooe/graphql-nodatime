@@ -19,8 +19,10 @@ namespace GraphQL.NodaTime
         {
             if (value is string)
                 return value;
-            if (value is LocalDate)
-                return (value as LocalDate?)?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            if (value is LocalDate localDateValue)
+                return LocalDatePattern.Iso
+                    .WithCulture(CultureInfo.InvariantCulture)
+                    .Format(localDateValue);
             return value;
         }
 
@@ -31,7 +33,9 @@ namespace GraphQL.NodaTime
 
             try
             {
-                var ret = LocalDatePattern.Iso.Parse(stringValue).GetValueOrThrow();
+                var ret = LocalDatePattern.Iso
+                    .WithCulture(CultureInfo.InvariantCulture)
+                    .Parse(stringValue).GetValueOrThrow();
                 return ret;
             } 
             catch (Exception) { return null; }
@@ -44,7 +48,9 @@ namespace GraphQL.NodaTime
 
             try
             {
-                var ret = LocalDatePattern.Iso.Parse(stringValue.Value).GetValueOrThrow();
+                var ret = LocalDatePattern.Iso
+                    .WithCulture(CultureInfo.InvariantCulture)
+                    .Parse(stringValue.Value).GetValueOrThrow();
                 return ret;
             } 
             catch (Exception) { return null; }
