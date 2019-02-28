@@ -4,6 +4,7 @@ using GraphQL.Types;
 namespace GraphQL.NodaTime.Tests
 {
     public static class SchemaBuilder<GraphType, UnderlyingType>
+        where GraphType : GraphQL.Types.GraphType
     {
         public class QueryGraphType : ObjectGraphType
         {

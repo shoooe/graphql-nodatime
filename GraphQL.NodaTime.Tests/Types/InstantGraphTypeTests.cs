@@ -6,137 +6,184 @@ using Xunit;
 
 namespace GraphQL.NodaTime.Tests
 {
+    using Builder = TestBuilder<InstantGraphType, Instant>;
+
     public class InstantGraphTypeTests
     {
         [Fact]
         public void QueryReturnsSerializedData()
         {
-            var schema = SchemaBuilder<InstantGraphType, Instant>.Build(
-                Instant.FromUtc(2019, 10, 2, 12, 14, 18),
-                instant => instant + Duration.FromHours(3)
-            );
-            var json = schema.Execute(options =>
-            {
-                options.Query = "query { test }";
-                options.Schema = schema;
-            });
-            var result = JsonConvert.DeserializeObject<QueryResult<string>>(json);
+            var result = Builder.Serialize<string>(
+                Instant.FromUtc(2019, 10, 2, 12, 14, 18));
             Assert.Equal("2019-10-02T12:14:18Z", result.Data.Test);
-        }
-
-        private void AssertParseLiteral(string from, string to, Duration difference)
-        {
-            var schema = SchemaBuilder<InstantGraphType, Instant>.Build(
-                Instant.FromUtc(2019, 10, 2, 12, 14, 18),
-                instant => instant + difference
-            );
-            var json = schema.Execute(options =>
-            {
-                options.Query = $"mutation {{ test(arg: \"{from}\") }}";
-                options.Schema = schema;
-            });
-            var result = JsonConvert.DeserializeObject<QueryResult<string>>(json);
-            Assert.Equal(to, result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesLiteral()
         {
-            AssertParseLiteral("2019-10-02T12:14:18Z", "2019-10-02T15:14:18Z", Duration.FromHours(3));
+            var result = Builder.ParseLiteral<string, string>(
+                "2019-10-02T12:14:18Z", x => x + Duration.FromHours(3));
+            Assert.Equal("2019-10-02T15:14:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesLiteralWithOffset()
         {
-            AssertParseLiteral("2019-10-02T12:14:18+01:30", "2019-10-02T10:47:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseLiteral<string, string>(
+                "2019-10-02T12:14:18+01:30", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T10:47:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesLiteralWithOffsetWithoutColons()
         {
-            AssertParseLiteral("2019-10-02T12:14:18+0130", "2019-10-02T10:47:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseLiteral<string, string>(
+                "2019-10-02T12:14:18+0130", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T10:47:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesLiteralWithOffsetWithoutMinutes()
         {
-            AssertParseLiteral("2019-10-02T12:14:18+01", "2019-10-02T11:17:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseLiteral<string, string>(
+                "2019-10-02T12:14:18+01", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T11:17:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesLiteralWithNegativeOffset()
         {
-            AssertParseLiteral("2019-10-02T12:14:18-01:30", "2019-10-02T13:47:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseLiteral<string, string>(
+                "2019-10-02T12:14:18-01:30", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T13:47:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesLiteralWithNegativeOffsetWithoutColons()
         {
-            AssertParseLiteral("2019-10-02T12:14:18-0130", "2019-10-02T13:47:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseLiteral<string, string>(
+                "2019-10-02T12:14:18-0130", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T13:47:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesLiteralWithNegativeOffsetWithoutMinutes()
         {
-            AssertParseLiteral("2019-10-02T12:14:18-01", "2019-10-02T13:17:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseLiteral<string, string>(
+                "2019-10-02T12:14:18-01", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T13:17:18Z", result.Data.Test);
         }
 
-        private void AssertParsesInput(string from, string to, Duration difference)
+        [Fact]
+        public void MutationDoesntParseMalformedLiteral()
         {
-            var schema = SchemaBuilder<InstantGraphType, Instant>.Build(
-                Instant.FromUtc(2019, 10, 2, 12, 14, 18),
-                instant => instant + difference
-            );
-            var json = schema.Execute(options =>
-            {
-                options.Query = "mutation($arg: Instant!) { test(arg: $arg) }";
-                options.Schema = schema;
-                options.Inputs = $"{{ \"arg\": \"{from}\" }}".ToInputs();
-            });
-            var result = JsonConvert.DeserializeObject<QueryResult<string>>(json);
-            Assert.Equal(to, result.Data.Test);
+            var result = Builder.ParseLiteral<string, string>(
+                "malformed", x => x + Duration.FromHours(3));
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
+        }
+
+        [Fact]
+        public void MutationDoesntTryToParseDateLiteral()
+        {
+            var result = Builder.ParseLiteral<string, string>(
+                "2019-10-02", x => x + Duration.FromHours(3));
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
+        }
+
+        [Fact]
+        public void MutationDoesntTryToParseTimeLiteral()
+        {
+
+            var result = Builder.ParseLiteral<string, string>(
+                "15:14:18", x => x + Duration.FromHours(3));
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
         }
 
         [Fact]
         public void MutationParsesInput()
         {
-            AssertParsesInput("2019-10-02T12:14:18Z", "2019-10-02T15:14:18Z", Duration.FromHours(3));
+            var result = Builder.ParseInput<string, string>(
+                "2019-10-02T12:14:18Z", x => x + Duration.FromHours(3));
+            Assert.Equal("2019-10-02T15:14:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesInputWithOffset()
         {
-            AssertParsesInput("2019-10-02T12:14:18+01:30", "2019-10-02T10:47:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseInput<string, string>(
+                "2019-10-02T12:14:18+01:30", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T10:47:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesInputWithOffsetWithoutColons()
         {
-            AssertParsesInput("2019-10-02T12:14:18+0130", "2019-10-02T10:47:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseInput<string, string>(
+                "2019-10-02T12:14:18+0130", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T10:47:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesInputWithOffsetWithoutMinutes()
         {
-            AssertParsesInput("2019-10-02T12:14:18+01", "2019-10-02T11:17:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseInput<string, string>(
+                "2019-10-02T12:14:18+01", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T11:17:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesInputWithNegativeOffset()
         {
-            AssertParsesInput("2019-10-02T12:14:18-01:30", "2019-10-02T13:47:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseInput<string, string>(
+                "2019-10-02T12:14:18-01:30", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T13:47:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesInputWithNegativeOffsetWithoutColons()
         {
-            AssertParsesInput("2019-10-02T12:14:18-0130", "2019-10-02T13:47:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseInput<string, string>(
+                "2019-10-02T12:14:18-0130", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T13:47:18Z", result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesInputWithNegativeOffsetWithoutMinutes()
         {
-            AssertParsesInput("2019-10-02T12:14:18-01", "2019-10-02T13:17:18Z", Duration.FromMinutes(3));
+            var result = Builder.ParseInput<string, string>(
+                "2019-10-02T12:14:18-01", x => x + Duration.FromMinutes(3));
+            Assert.Equal("2019-10-02T13:17:18Z", result.Data.Test);
+        }
+
+        [Fact]
+        public void MutationDoesntParseMalformedInput()
+        {
+            var result = Builder.ParseInput<string, string>(
+                "malformed", x => x + Duration.FromHours(3));
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
+        }
+
+        [Fact]
+        public void MutationDoesntTryToParseDateInput()
+        {
+            var result = Builder.ParseInput<string, string>(
+                "2019-10-02", x => x + Duration.FromHours(3));
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
+        }
+
+        [Fact]
+        public void MutationDoesntTryToParseTimeInput()
+        {
+
+            var result = Builder.ParseInput<string, string>(
+                "15:14:18", x => x + Duration.FromHours(3));
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
         }
     }
 }

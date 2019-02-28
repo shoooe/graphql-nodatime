@@ -6,9 +6,11 @@ using Xunit;
 
 namespace GraphQL.NodaTime.Tests
 {
+    using Builder = TestBuilder<IsoDayOfWeekGraphType, IsoDayOfWeek>;
+    
     public class IsoDayOfWeekGraphTypeTests
     {
-        public static IsoDayOfWeek Increment(IsoDayOfWeek day)
+        private static IsoDayOfWeek Increment(IsoDayOfWeek day)
         {
             var intRepr = (int)day;
             var nextIntRepr = Math.Max(1, (intRepr + 1) % 8);
@@ -16,84 +18,86 @@ namespace GraphQL.NodaTime.Tests
         }
 
         [Fact]
-        public void QueryReturnsFriday()
-        {
-            var schema = SchemaBuilder<IsoDayOfWeekGraphType, IsoDayOfWeek>.Build(
-                IsoDayOfWeek.Friday,
-                Increment
-            );
-            var json = schema.Execute(options =>
-            {
-                options.Query = "query { test }";
-                options.Schema = schema;
-            });
-            var result = JsonConvert.DeserializeObject<QueryResult<int>>(json);
-            Assert.Equal(5, result.Data.Test);
-        }
-
-        [Fact]
         public void QueryReturnsMonday()
         {
-            var schema = SchemaBuilder<IsoDayOfWeekGraphType, IsoDayOfWeek>.Build(
-                IsoDayOfWeek.Monday,
-                Increment
-            );
-            var json = schema.Execute(options =>
-            {
-                options.Query = "query { test }";
-                options.Schema = schema;
-            });
-            var result = JsonConvert.DeserializeObject<QueryResult<int>>(json);
+            var result = Builder.Serialize<int>(IsoDayOfWeek.Monday);
             Assert.Equal(1, result.Data.Test);
         }
 
         [Fact]
         public void QueryReturnsSunday()
         {
-            var schema = SchemaBuilder<IsoDayOfWeekGraphType, IsoDayOfWeek>.Build(
-                IsoDayOfWeek.Sunday,
-                Increment
-            );
-            var json = schema.Execute(options =>
-            {
-                options.Query = "query { test }";
-                options.Schema = schema;
-            });
-            var result = JsonConvert.DeserializeObject<QueryResult<int>>(json);
+            var result = Builder.Serialize<int>(IsoDayOfWeek.Sunday);
             Assert.Equal(7, result.Data.Test);
+        }
+
+        [Fact]
+        public void QueryReturnsFriday()
+        {
+            var result = Builder.Serialize<int>(IsoDayOfWeek.Friday);
+            Assert.Equal(5, result.Data.Test);
         }
 
         [Fact]
         public void MutationParsesLiteral()
         {
-            var schema = SchemaBuilder<IsoDayOfWeekGraphType, IsoDayOfWeek>.Build(
-                IsoDayOfWeek.Friday,
-                Increment
-            );
-            var json = schema.Execute(options =>
-            {
-                options.Query = "mutation { test(arg: 3) }";
-                options.Schema = schema;
-            });
-            var result = JsonConvert.DeserializeObject<QueryResult<int>>(json);
+            var result = Builder.ParseLiteral<int, int>(3, Increment);
             Assert.Equal(4, result.Data.Test);
+        }
+
+        [Fact]
+        public void MutationDoesntParseZeroLiteral()
+        {
+            var result = Builder.ParseLiteral<int, int>(0, Increment);
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
+        }
+
+        [Fact]
+        public void MutationDoesntParseNegativeLiteral()
+        {
+            var result = Builder.ParseLiteral<int, int>(-3, Increment);
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
+        }
+
+        [Fact]
+        public void MutationDoesntParseOutOfRangeLiteral()
+        {
+            var result = Builder.ParseLiteral<int, int>(8, Increment);
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
         }
 
         [Fact]
         public void MutationParsesInput()
         {
-            var schema = SchemaBuilder<IsoDayOfWeekGraphType, IsoDayOfWeek>.Build(
-                IsoDayOfWeek.Friday,
-                Increment
-            );
-            var json = schema.Execute(options =>
-            {
-                options.Query = "mutation($arg: IsoDayOfWeek!) { test(arg: $arg) }";
-                options.Schema = schema;
-                options.Inputs = "{ \"arg\": 7 }".ToInputs();
-            });
-            var result = JsonConvert.DeserializeObject<QueryResult<int>>(json);
+            var result = Builder.ParseInput<int, int>(7, Increment);
             Assert.Equal(1, result.Data.Test);
+        }
+
+        [Fact]
+        public void MutationDoesntParseZeroInput()
+        {
+            var result = Builder.ParseInput<int, int>(0, Increment);
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
+        }
+
+        [Fact]
+        public void MutationDoesntParseNegativeInput()
+        {
+            var result = Builder.ParseInput<int, int>(-3, Increment);
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
+        }
+
+        [Fact]
+        public void MutationDoesntParseOutOfRangeInput()
+        {
+            var result = Builder.ParseInput<int, int>(8, Increment);
+            Assert.Null(result.Data);
+            Assert.NotEmpty(result.Errors);
         }
     }
 }
