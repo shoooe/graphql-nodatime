@@ -12,6 +12,7 @@ namespace GraphQL.NodaTime
         public LocalTimeGraphType()
         {
             Name = "LocalTime";
+            Description = "Represents a time of day, with no reference to a particular calendar, time zone or date.";
         }
 
         public override object Serialize(object value)

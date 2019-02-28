@@ -12,6 +12,7 @@ namespace GraphQL.NodaTime
         public InstantGraphType()
         {
             Name = "Instant";
+            Description = "Represents an instant on the global timeline.";
         }
 
         public override object Serialize(object value)

@@ -12,6 +12,7 @@ namespace GraphQL.NodaTime
         public LocalDateGraphType()
         {
             Name = "LocalDate";
+            Description = "Represents a date within the calendar, with no reference to a particular time zone or time of day.";
         }
 
         public override object Serialize(object value)
@@ -27,7 +28,7 @@ namespace GraphQL.NodaTime
         {
             if (!(value is string stringValue))
                 throw new FormatException();
-                
+
             try
             {
                 var ret = LocalDatePattern.Iso.Parse(stringValue).GetValueOrThrow();

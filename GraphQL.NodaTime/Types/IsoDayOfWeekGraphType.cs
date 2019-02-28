@@ -11,6 +11,7 @@ namespace GraphQL.NodaTime
         public IsoDayOfWeekGraphType()
         {
             Name = "IsoDayOfWeek";
+            Description = "Represents a day of the week according to ISO-8601 (Monday = 1, Sunday = 7).";
         }
 
         public override object Serialize(object value)
