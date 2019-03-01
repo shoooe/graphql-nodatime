@@ -36,6 +36,8 @@ Here's a list of all supported types:
 | IsoDayOfWeek      | IsoDayOfWeekGraphType |
 | LocalDate      | LocalDateGraphType |
 | LocalTime      | LocalTimeGraphType |
+| OffsetDateTime      | OffsetDateTimeGraphType |
+| Offset      | OffsetGraphType |
 
 ## Design decisions
 
