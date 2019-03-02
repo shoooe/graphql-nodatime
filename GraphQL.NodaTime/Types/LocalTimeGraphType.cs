@@ -23,7 +23,7 @@ namespace GraphQL.NodaTime
                 return LocalTimePattern.ExtendedIso
                     .WithCulture(CultureInfo.InvariantCulture)
                     .Format(localTime);
-            return value;
+            return null;
         }
 
         public override object ParseValue(object value)

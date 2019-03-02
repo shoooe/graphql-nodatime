@@ -20,7 +20,7 @@ namespace GraphQL.NodaTime
                 return value;
             if (value is IsoDayOfWeek dowValue)
                 return (int)dowValue;
-            return value;
+            return null;
         }
 
         public override object ParseValue(object value)

@@ -53,7 +53,7 @@ namespace GraphQL.NodaTime
                     .Parse(stringValue.Value).GetValueOrThrow();
                 return ret;
             } 
-            catch (Exception e) { return null; }
+            catch (Exception) { return null; }
         }
     }
 }

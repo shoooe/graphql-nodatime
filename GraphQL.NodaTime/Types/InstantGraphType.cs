@@ -25,7 +25,7 @@ namespace GraphQL.NodaTime
                 return InstantPattern.ExtendedIso
                     .WithCulture(CultureInfo.InvariantCulture)
                     .Format(instant);
-            return value;
+            return null;
         }
 
         private static object FromString(string stringValue)

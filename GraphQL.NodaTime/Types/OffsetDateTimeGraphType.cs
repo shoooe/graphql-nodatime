@@ -25,7 +25,7 @@ namespace GraphQL.NodaTime
                 return OffsetDateTimePattern.ExtendedIso
                     .WithCulture(CultureInfo.InvariantCulture)
                     .Format(offsetDateTime);
-            return value;
+            return null;
         }
 
         private static object FromString(string stringValue)
