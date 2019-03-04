@@ -35,6 +35,7 @@ Here's a list of all supported types:
 | Instant      | InstantGraphType |
 | IsoDayOfWeek      | IsoDayOfWeekGraphType |
 | LocalDate      | LocalDateGraphType |
+| LocalDateTime      | LocalDateTimeGraphType |
 | LocalTime      | LocalTimeGraphType |
 | OffsetDateTime      | OffsetDateTimeGraphType |
 | Offset      | OffsetGraphType |
