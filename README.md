@@ -2,7 +2,7 @@
 
 This library introduces NodaTime types to GraphQL.
 
-⚠️ This library is not maintained anymore. I recommend using HotChocolate as a GraphQL which supports NodaTime out of the box.
+⚠️ This library is not maintained anymore. I recommend using HotChocolate which supports NodaTime out of the box.
 
 ## Installation
 
