@@ -2,6 +2,8 @@
 
 This library introduces NodaTime types to GraphQL.
 
+⚠️ This library is not maintained anymore. I recommend using HotChocolate as a GraphQL which supports NodaTime out of the box.
+
 ## Installation
 
 The library is hosted on [NuGet](https://www.nuget.org/), therefore you just need to run:
